@@ -11,8 +11,7 @@ import (
 )
 
 type Message struct {
-	Name     string `json:"name"`
-	Response string `json:"response"`
+	Name string `json:"name"`
 }
 
 // curl localhost:8000 -d '{"name":"Hello"}'
