@@ -10,8 +10,12 @@ import (
 	"net/http"
 )
 
-type Message struct {
+type MessageRequest struct {
 	Name string `json:"name"`
+}
+
+type MessageResponse struct {
+	Response string `json:"respond"`
 }
 
 // curl localhost:8000 -d '{"name":"Hello"}'
@@ -25,16 +29,17 @@ func VictorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Unmarshal
-	var msg Message
+	var msg MessageRequest
 	err = json.Unmarshal(b, &msg)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	m := map[string]string{}
-	m["response"] = "Hello, " + msg.Name
 
-	output, err := json.Marshal(m)
+	var msgr MessageResponse
+	msgr.Response = "Hello, " + msg.Name
+
+	output, err := json.Marshal(msgr)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
