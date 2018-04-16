@@ -42,13 +42,17 @@ type RideData struct {
 
 //RideValues - calculate values
 type RideValues struct {
-	ID       string `json:"id"`
-	Distance string `json:"distance"`
-	Duration string `json:"duration"`
+	ID       int     `json:"id"`
+	Distance float64 `json:"distance"`
+	Duration float64 `json:"duration"`
+}
+
+type Response struct {
+	Rows []Rows `json:"rows"`
 }
 
 type Rows struct {
-	Rows []Elements `json:"elements"`
+	Elements []Elements `json:"elements"`
 }
 
 type Elements struct {
@@ -57,11 +61,11 @@ type Elements struct {
 }
 
 type Distance struct {
-	Value int `json:"value"`
+	Value float64 `json:"value"`
 }
 
 type Duration struct {
-	Value int `json:"value"`
+	Value float64 `json:"value"`
 }
 
 var rides []RideData
@@ -84,6 +88,8 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	rideJSON, _ := json.Marshal(ride)
 
+	rides = append(rides, ride)
+
 	ID++
 	fmt.Println("LOG: " + string(rideJSON))
 	GetDistanceAndDuration(ride.StartLat, ride.EndLat, ride.StartLong, ride.EndLong)
@@ -105,8 +111,15 @@ func GetDistanceAndDuration(slat string, endlat string, slng string, endlng stri
 		panic(err)
 	}
 
-	var rows Rows
-	json.Unmarshal(bodyBytes, &rows)
-	fmt.Println(rows)
-	fmt.Println(string(bodyBytes))
+	var resp Response
+	json.Unmarshal(bodyBytes, &resp)
+
+	rw := RideValues{
+		ID:       rides[len(rides)-1].ID,
+		Distance: resp.Rows[0].Elements[0].Distance.Value,
+		Duration: resp.Rows[0].Elements[0].Duration.Value,
+	}
+
+	data, err := json.Marshal(rw)
+	fmt.Println(string(data))
 }
